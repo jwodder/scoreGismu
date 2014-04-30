@@ -2,7 +2,11 @@
 use strict;
 use Algorithm::Diff qw(LCS);
 
-my $gimste = 'gismu.txt';
+my $gimste;
+if (@ARGV && $ARGV[0] =~ /^-g/) {
+ if ($ARGV[0] eq '-g') {shift; $gimste = shift; }
+ else { $gimste = substr shift, 2 }
+}
 
 my @checks;
 while (<>) {
@@ -73,27 +77,29 @@ for my $c1 (@initialPairs) {
  }
 }
 
-open(IN, '<', $gimste) or die "Couldn't open $gimste: $!\n";
-while (<IN>) {
- if (/\s*([a-gi-pr-vxz]{5})(?:\s+|$)/) {
-  my $gismu = $1;
-  my $g4 = substr($gismu, 0, 4);
-  delete $possibleGismu{"$g4$_"} for @vowels;
-  for my $i (0..3) {
-   my $letter = substr($gismu, $i, 1);
-   if (exists $blockingLetters{$letter}) {
-    for my $newLetter (@{$blockingLetters{$letter}}) {
-     substr($gismu, $i, 1) = $newLetter;
-     delete $possibleGismu{$gismu};
+if (defined $gimste) {
+ open(IN, '<', $gimste) or die "$0: $gimste: $!";
+ while (<IN>) {
+  if (/\s*([a-gi-pr-vxz]{5})(?:\s+|$)/) {
+   my $gismu = $1;
+   my $g4 = substr($gismu, 0, 4);
+   delete $possibleGismu{"$g4$_"} for @vowels;
+   for my $i (0..3) {
+    my $letter = substr($gismu, $i, 1);
+    if (exists $blockingLetters{$letter}) {
+     for my $newLetter (@{$blockingLetters{$letter}}) {
+      substr($gismu, $i, 1) = $newLetter;
+      delete $possibleGismu{$gismu};
+     }
+     substr($gismu, $i, 1) = $letter;
     }
-    substr($gismu, $i, 1) = $letter;
    }
   }
  }
+ close IN;
 }
-close IN;
 
-print "Preliminary work finished. Beginning scoring.\n";
+print "Preliminary work finished.  Beginning scoring.\n";
 
 for my $check (@checks) {
  my @sourceWords = @$check;

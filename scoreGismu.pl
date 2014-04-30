@@ -4,18 +4,18 @@ use Algorithm::Diff qw(LCS);
 
 my $gimste = 'gismu.txt';
 
-my @checks = ();
+my @checks;
 while (<>) {
- my %sourceWords = ();
- my @sourceWords = ();
- if (/^\s*(?:\S+\s+\d*\.?\d+\s*)+\s*$/) {
+ my %sourceWords;
+ my @sourceWords;
+ if (/^\s*(?:\S+\s+\d*\.?\d+\s*)+$/) {
   my @temp = split;
   for (my $i=0; $i<@temp; $i+=2) {
    $sourceWords{$temp[$i]} += $temp[$i+1];
   }
   push @sourceWords, [$_, $sourceWords{$_}, [split //]] for keys %sourceWords;
  } elsif (/\S/) {
-  ++$sourceWords{$_} for split /\s+/;
+  ++$sourceWords{$_} for split;
   push @sourceWords, [$_, $sourceWords{$_}, [split //]] for keys %sourceWords;
  }
  push @checks, [@sourceWords] if @sourceWords;
@@ -23,28 +23,37 @@ while (<>) {
 
 my @vowels = qw(a e i o u);
 my @consonants = qw(m n l r p t k f s c x b d g v z j);
-my @initialPairs = qw(ml mr pl pr tr ts tc kl kr fl fr sm sn sl sr sp st sk sf cm cn cl cr cp ct ck cf xl xr bl br dr dz dj gl gr vl vr zm zb zd zg zv jm jb jd jg jv);
-my @internalPairs = qw(mn ml mr mp mt mk mf ms mc mx mb md mg mv mj nm nl nr np nt nk nf ns nc nx nb nd ng nv nz nj ln lm lr lp lt lk lf ls lc lx lb ld lg lv lz lj rn rm rl rp rt rk rf rs rc rx rb rd rg rv rz rj pn pm pl pr pt pk pf ps pc px tn tm tl tr tp tk tf ts tc tx kn km kl kr kp kt kf ks kc fn fm fl fr fp ft fk fs fc fx sn sm sl sr sp st sk sf sx cn cm cl cr cp ct ck cf xn xm xl xr xp xt xf xs bn bm bl br bd bg bv bz bj dn dm dl dr db dg dv dz dj gn gm gl gr gb gd gv gz gj vn vm vl vr vb vd vg vz vj zn zm zl zr zb zd zg zv jn jm jl jr jb jd jg jv);
+my @initialPairs = qw(ml mr pl pr tr ts tc kl kr fl fr sm sn sl sr sp st sk sf
+ cm cn cl cr cp ct ck cf xl xr bl br dr dz dj gl gr vl vr zm zb zd zg zv jm jb
+ jd jg jv);
+my @internalPairs = qw(mn ml mr mp mt mk mf ms mc mx mb md mg mv mj nm nl nr np
+ nt nk nf ns nc nx nb nd ng nv nz nj ln lm lr lp lt lk lf ls lc lx lb ld lg lv
+ lz lj rn rm rl rp rt rk rf rs rc rx rb rd rg rv rz rj pn pm pl pr pt pk pf ps
+ pc px tn tm tl tr tp tk tf ts tc tx kn km kl kr kp kt kf ks kc fn fm fl fr fp
+ ft fk fs fc fx sn sm sl sr sp st sk sf sx cn cm cl cr cp ct ck cf xn xm xl xr
+ xp xt xf xs bn bm bl br bd bg bv bz bj dn dm dl dr db dg dv dz dj gn gm gl gr
+ gb gd gv gz gj vn vm vl vr vb vd vg vz vj zn zm zl zr zb zd zg zv jn jm jl jr
+ jb jd jg jv);
 
 my %blockingLetters = ('m' => ['n'],
-                    'n' => ['m'],
-                    'l' => ['r'],
-                    'r' => ['l'],
-                    'p' => ['b', 'f'],
-                    't' => ['d'],
-                    'k' => ['g', 'x'],
-                    'f' => ['v', 'p'],
-                    's' => ['z', 'c'],
-                    'c' => ['j', 's'],
-                    'x' => ['g', 'k'],
-                    'b' => ['p', 'v'],
-                    'd' => ['t'],
-                    'g' => ['k', 'x'],
-                    'v' => ['b', 'f'],
-                    'z' => ['j', 's'],
-                    'j' => ['c', 'z']);
+		       'n' => ['m'],
+		       'l' => ['r'],
+		       'r' => ['l'],
+		       'p' => ['b', 'f'],
+		       't' => ['d'],
+		       'k' => ['g', 'x'],
+		       'f' => ['v', 'p'],
+		       's' => ['z', 'c'],
+		       'c' => ['j', 's'],
+		       'x' => ['g', 'k'],
+		       'b' => ['p', 'v'],
+		       'd' => ['t'],
+		       'g' => ['k', 'x'],
+		       'v' => ['b', 'f'],
+		       'z' => ['j', 's'],
+		       'j' => ['c', 'z']);
 
-my %possibleGismu = ();
+my %possibleGismu;
 for my $c1 (@consonants) {
  for my $v1 (@vowels) {
   for my $c2 (@internalPairs) {
@@ -94,7 +103,7 @@ for my $check (@checks) {
  print "\n";
  my $count = 0;
  my $max = 0;
- my @bestGismu = ();
+ my @bestGismu;
  for my $gismu (keys %possibleGismu) {
   ++$count;
   print "First $count possible gismu scored.\n" if $count % 10000 == 0;

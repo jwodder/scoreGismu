@@ -111,11 +111,9 @@ for $check (@checks) {
    if(@lcs >= 3) {
     $score += $weight * @lcs / @wordSequence;
    } elsif(@lcs == 2) {
-    if($gismu =~ /$lcs[0].?$lcs[1]/) {
-     if($word =~ /$lcs[0].?$lcs[1]/) {
-      $score += $weight * 2 / @wordSequence;
-     }
-    }
+    $score += $weight * 2 / @wordSequence
+     if $gismu =~ /$lcs[0]$lcs[1]/ && $word =~ /$lcs[0]$lcs[1]/
+     || $gismu =~ /$lcs[0].$lcs[1]/ && $word =~ /$lcs[0].$lcs[1]/
    }
   }
   if($score >= $max) {

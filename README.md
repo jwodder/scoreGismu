@@ -21,7 +21,7 @@ be specified with the `-g` switch.  Any _gismu_ listed in this file or that
 conflicts with a _gismu_ in this file will be excluded from consideration for
 the algorithm.
 
-This code was originally taken from [[1]][1], where it [was credited to one
+This code was originally taken from [\[1\]][1], where it [was credited to one
 "Hussell"][2].
 
 For reference, the language weights used in creating the official _gismu_ were,

@@ -2,6 +2,8 @@
 use strict;
 use Algorithm::Diff qw(LCS);
 
+my $maxQty = 5;
+
 my $gimste;
 if (@ARGV && $ARGV[0] =~ /^-g/) {
  if ($ARGV[0] eq '-g') {shift; $gimste = shift; }
@@ -108,8 +110,8 @@ for my $check (@checks) {
   for sort { $$b[1] <=> $$a[1] or $$a[0] cmp $$b[0] } @sourceWords;
  print "\n";
  my $count = 0;
- my $max = 0;
- my @bestGismu;
+ my $minMax = 0;
+ my @bestGismu = ([0]);
  for my $gismu (keys %possibleGismu) {
   ++$count;
   print "First $count possible gismu scored.\n" if $count % 10000 == 0;
@@ -127,15 +129,22 @@ for my $check (@checks) {
      || $gismu =~ /$lcs[0].$lcs[1]/ && $word =~ /$lcs[0].$lcs[1]/
    }
   }
-  if ($score >= $max) {
-   $max = $score;
-   unshift(@bestGismu, [$gismu, $score]);
+  if ($score >= $minMax) {
+   for my $i (0..$#bestGismu) {
+    if ($score == $bestGismu[$i][0]) {
+     push @{$bestGismu[$i]}, $gismu;
+     last;
+    } elsif ($score > $bestGismu[$i][0]) {
+     splice @bestGismu, $i, 0, [$score, $gismu];
+     if (@bestGismu > $maxQty) {
+      pop @bestGismu;
+      $minMax = $bestGismu[$maxQty-1][0];
+     }
+     last;
+    }
+   }
   }
  }
- print "Top score is $max.\n";
- for my $gismu (@bestGismu) {
-  last if @$gismu[1] < $max;
-  print " @$gismu[0]";
- }
- print "\n";
+ print "Top score is $bestGismu[0][0].\n";
+ print " @$_\n" for @bestGismu;
 }

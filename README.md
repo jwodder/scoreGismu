@@ -10,11 +10,11 @@ of Lojbanized source words and their language weights, e.g.:
 Alternatively, a line may contain only Lojbanized source words, in which case
 the weights are the number of times each word appears on the line.
 
-For each input line, `scoreGismu.pl` will calculate the _gismu_ that matches
-the given source words the best according to the scoring algorithm and will
-output the top scorer(s).  Note that calculations for separate lines do not
-take each other into account, and so if multiple _gismu_ are produced at once,
-they may conflict with each other.
+For each input line, `scoreGismu.pl` will calculate the _gismu_ that match the
+given source words the best according to the scoring algorithm and output the
+top scorers.  Note that calculations for separate lines do not take each other
+into account, and so if multiple _gismu_ sets are produced at once, they may
+conflict with each other.
 
 A file containing a list of pre-existing _gismu_, one per line, may optionally
 be specified with the `-g` switch.  Any _gismu_ listed in this file or that

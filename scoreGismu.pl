@@ -1,14 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
 use Algorithm::Diff qw(LCS);
+use Getopt::Std;
 
 my $maxQty = 5;
-
-my $gimste;
-if (@ARGV && $ARGV[0] =~ /^-g/) {
- if ($ARGV[0] eq '-g') {shift; $gimste = shift; }
- else { $gimste = substr shift, 2 }
-}
+my %opts;
+getopts('g:m:', \%opts) || exit 2;
+$maxQty = int($opts{m}) || $maxQty if $opts{m};
 
 my @checks;
 while (<>) {
@@ -79,8 +77,8 @@ for my $c1 (@initialPairs) {
  }
 }
 
-if (defined $gimste) {
- open(IN, '<', $gimste) or die "$0: $gimste: $!";
+if (exists $opts{g}) {
+ open(IN, '<', $opts{g}) or die "$0: $opts{g}: $!";
  while (<IN>) {
   if (/\s*([a-gi-pr-vxz]{5})(?:\s+|$)/) {
    my $gismu = $1;
@@ -146,5 +144,5 @@ for my $check (@checks) {
   }
  }
  print "Top score is $bestGismu[0][0].\n";
- print " @$_\n" for @bestGismu;
+ printf " %-6g - %s\n", $_->[0], join(' ', splice(@$_, 1)) for @bestGismu;
 }

@@ -11,18 +11,16 @@ $maxQty = int($opts{m}) || $maxQty if $opts{m};
 my @checks;
 while (<>) {
  my %sourceWords;
- my @sourceWords;
  if (/^\s*(?:\S+\s+\d*\.?\d+\s*)+$/) {
   my @temp = split;
   for (my $i=0; $i<@temp; $i+=2) {
    $sourceWords{$temp[$i]} += $temp[$i+1];
   }
-  push @sourceWords, [$_, $sourceWords{$_}, [split //]] for keys %sourceWords;
  } elsif (/\S/) {
   ++$sourceWords{$_} for split;
-  push @sourceWords, [$_, $sourceWords{$_}, [split //]] for keys %sourceWords;
  }
- push @checks, [@sourceWords] if @sourceWords;
+ push @checks, [ map { [$_, $sourceWords{$_}, [split //]] } keys %sourceWords ]
+  if %sourceWords;
 }
 
 my @vowels = qw(a e i o u);
@@ -80,7 +78,7 @@ for my $c1 (@initialPairs) {
 if (exists $opts{g}) {
  open(IN, '<', $opts{g}) or die "$0: $opts{g}: $!";
  while (<IN>) {
-  if (/\s*([a-gi-pr-vxz]{5})(?:\s+|$)/) {
+  if (/^\s*([a-gi-pr-vxz]{5})\s*$/) {
    my $gismu = $1;
    my $g4 = substr($gismu, 0, 4);
    delete $possibleGismu{"$g4$_"} for @vowels;
@@ -121,7 +119,7 @@ for my $check (@checks) {
    my @wordSequence = @{$$source[2]};
    my @lcs = LCS(\@wordSequence, \@gismuSequence);
    if (@lcs >= 3) { $score += $weight * @lcs / @wordSequence }
-   elsif(@lcs == 2) {
+   elsif (@lcs == 2) {
     $score += $weight * 2 / @wordSequence
      if $gismu =~ /$lcs[0]$lcs[1]/ && $word =~ /$lcs[0]$lcs[1]/
      || $gismu =~ /$lcs[0].$lcs[1]/ && $word =~ /$lcs[0].$lcs[1]/

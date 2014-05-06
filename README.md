@@ -7,8 +7,10 @@ of Lojbanized source words and their language weights, e.g.:
 
     iun 0.347 upiog 0.196 emploi 0.160 us 0.123 primin 0.089 amal 0.085
 
-Alternatively, a line may contain only Lojbanized source words, in which case
-the weights are the number of times each word appears on the line.
+(If the same word appears more than once in the same line, its final weight is
+the sum of its listed weights.)  Alternatively, a line may contain only
+Lojbanized source words, in which case the weights are the number of times each
+word appears on the line.
 
 For each input line, `scoreGismu.pl` will calculate the _gismu_ that match the
 given source words the best according to the scoring algorithm and output the

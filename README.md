@@ -1,6 +1,6 @@
-    perl scoreGismu.pl [-g gismu file] [-m num] [input file]
+    scoreGismu [-g gismu file] [-m num] [input file]
 
-`scoreGismu.pl` implements steps 2 through 5 of the _gismu_ scoring algorithm
+`scoreGismu` implements steps 2 through 5 of the _gismu_ scoring algorithm
 described in §4.14 of _The Complete Lojban Language_ to produce a _gismu_ from
 a given set of source words.  Each line of input to the program specifies a set
 of Lojbanized source words and their language weights, e.g.:
@@ -12,7 +12,7 @@ the sum of its listed weights.)  Alternatively, a line may contain only
 Lojbanized source words, in which case the weights are the number of times each
 word appears on the line.
 
-For each input line, `scoreGismu.pl` will calculate the _gismu_ that match the
+For each input line, `scoreGismu` will calculate the _gismu_ that match the
 given source words the best according to the scoring algorithm and output the
 top 5 scores (or an amount specified with the `-m` switch) and the _gismu_ that
 obtained them.  Note that calculations for separate lines do not take each

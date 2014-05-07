@@ -44,9 +44,9 @@ const char blockingLetters[26][3] = {
 typedef pair< double, deque<string> > gismuRank;  /* This shows up too much. */
 
 deque< map<string,double> >* readInput(istream& in);
-string LCS(const string& a, const string& b);
+int LCS(const string& a, const string& b);
 bool cmpInput(pair<string,double> a, pair<string,double> b);
-bool hasXxX(const string& str, char c1, char c2);
+bool match2(const string& word, const string& gismu);
 bool cmpRank(const gismuRank& a, double b);
 
 int main(int argc, char** argv) {
@@ -174,12 +174,10 @@ int main(int argc, char** argv) {
    for (witer = sourceWords.begin(); witer != sourceWords.end(); witer++) {
     string word = witer->first;
     double weight = witer->second;
-    string lcs = LCS(word, gismu);
-    if (lcs.length() >= 3) {score += weight * lcs.length() / word.length(); }
-    else if (lcs.length() == 2) {
-     if ((gismu.find(lcs) != string::npos && word.find(lcs) != string::npos)
-	 || (hasXxX(gismu, lcs[0], lcs[1]) && hasXxX(word, lcs[0], lcs[1])))
-      score += weight * 2 / word.length();
+    int lcs = LCS(word, gismu);
+    if (lcs >= 3) {score += weight * lcs / word.length(); }
+    else if (lcs == 2 && match2(word, gismu)) {
+     score += weight * 2 / word.length();
     }
    }
    if (bestGismu.empty()) {
@@ -198,7 +196,7 @@ int main(int argc, char** argv) {
   cout << "Top score is " << bestGismu.front().first << "." << endl;
   list<gismuRank>::const_iterator bgiter;
   for (bgiter = bestGismu.begin(); bgiter != bestGismu.end(); bgiter++) {
-   cout << " " << (*bgiter).first << " -";  /* TODO: Output as %-6g */
+   cout << " " << (*bgiter).first << " -";
    deque<string>::const_iterator diter;
    const deque<string>& loiGismu((*bgiter).second);
    for (diter = loiGismu.begin(); diter != loiGismu.end(); diter++) {
@@ -234,7 +232,7 @@ deque< map<string,double> >* readInput(istream& in) {
  return checks;
 }
 
-string LCS(const string& a, const string& b) {
+int LCS(const string& a, const string& b) {
  int** lengths = new int*[a.length()+1];
  for (size_t i=0; i<a.length()+1; i++) {
   lengths[i] = new int[b.length()+1];
@@ -246,18 +244,7 @@ string LCS(const string& a, const string& b) {
    else lengths[i+1][j+1] = max(lengths[i+1][j], lengths[i][j+1]);
   }
  }
- string result;
- int x = a.length();
- int y = b.length();
- while (x && y) {
-  if (lengths[x][y] == lengths[x-1][y]) {x--; }
-  else if (lengths[x][y] == lengths[x][y-1]) {y--; }
-  else {
-   result = a[x-1] + result;
-   x--;
-   y--;
-  }
- }
+ int result = lengths[a.length()][b.length()];
  for (size_t i=0; i<a.length()+1; i++) delete[] lengths[i];
  delete[] lengths;
  return result;
@@ -267,12 +254,22 @@ bool cmpInput(pair<string,double> a, pair<string,double> b) {
  return b.second < a.second || (b.second == a.second && a.first < b.first);
 }
 
-bool hasXxX(const string& str, char c1, char c2) {
- size_t start=0, i;
- while ((i = str.find(c1, start)) != string::npos) {
-  if (i+2 >= str.length()) return false;
-  else if (str[i+2] == c2) return true;
-  else start = i+1;
+
+bool match2(const string& word, const string& gismu) {
+ /* It's possible for there to be multiple two-character LCS's for a given pair
+  * of strings, one of which meets the criteria in step 2b of the {gismu}
+  * creation algorithm and one of which doesn't, and so the output from an LCS
+  * function (unless it returns *all* LCS's) can't be used for step 2b.
+  * Instead, almost all possible two-character substrings must be checked by
+  * brute-force.  If you've got a better idea, I'd like to hear it. */
+ for (size_t i=0; i<4; i++) {
+  size_t start=0, j;
+  while ((j = word.find(gismu[i], start)) != string::npos) {
+   if ((j+1 < word.length() && word[j+1] == gismu[i+1])
+       || (i<3 && j+2 < word.length() && word[j+2] == gismu[i+2])) {
+    return true;
+   } else {start = j+1; }
+  }
  }
  return false;
 }

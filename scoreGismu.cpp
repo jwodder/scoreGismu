@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
   sort(wordList.begin(), wordList.end(), cmpInput);
   deque< pair<string,double> >::const_iterator iter2;
   for (iter2 = wordList.begin(); iter2 != wordList.end(); iter2++) {
-   cout << ' ' << (*iter2).first << ' ' << (*iter2).second;
+   cout << ' ' << iter2->first << ' ' << iter2->second;
   }
   cout << endl;
   int count = 0;
@@ -175,30 +175,28 @@ int main(int argc, char** argv) {
     string word = witer->first;
     double weight = witer->second;
     int lcs = LCS(word, gismu);
-    if (lcs >= 3) {score += weight * lcs / word.length(); }
-    else if (lcs == 2 && match2(word, gismu)) {
-     score += weight * 2 / word.length();
-    }
+    if (lcs >= 3 || (lcs == 2 && match2(word, gismu)))
+     score += weight * lcs / word.length();
    }
    if (bestGismu.empty()) {
     bestGismu.push_back(gismuRank(score, deque<string>(1, gismu)));
    } else if (score >= bestGismu.back().first) {
     list<gismuRank>::iterator spot
      = lower_bound(bestGismu.begin(), bestGismu.end(), score, cmpRank);
-    if ((*spot).first == score) {
-     (*spot).second.push_back(gismu);
+    if (spot->first == score) {
+     spot->second.push_back(gismu);
     } else {
      bestGismu.insert(spot, gismuRank(score, deque<string>(1, gismu)));
-     if (bestGismu.size() > maxQty) bestGismu.pop_back();
+     if (bestGismu.size() > (size_t) maxQty) bestGismu.pop_back();
     }
    }
   }
   cout << "Top score is " << bestGismu.front().first << "." << endl;
   list<gismuRank>::const_iterator bgiter;
   for (bgiter = bestGismu.begin(); bgiter != bestGismu.end(); bgiter++) {
-   cout << " " << (*bgiter).first << " -";
+   cout << " " << bgiter->first << " -";
    deque<string>::const_iterator diter;
-   const deque<string>& loiGismu((*bgiter).second);
+   const deque<string>& loiGismu(bgiter->second);
    for (diter = loiGismu.begin(); diter != loiGismu.end(); diter++) {
     cout << " " << *diter;
    }

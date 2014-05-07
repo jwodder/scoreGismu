@@ -106,8 +106,7 @@ for my $check (@checks) {
   for sort { $$b[1] <=> $$a[1] or $$a[0] cmp $$b[0] } @sourceWords;
  print "\n";
  my $count = 0;
- my $minMax = 0;
- my @bestGismu = ([0]);
+ my @bestGismu;
  for my $gismu (keys %possibleGismu) {
   ++$count;
   print "First $count possible gismu scored.\n" if $count % 10000 == 0;
@@ -118,22 +117,18 @@ for my $check (@checks) {
    my $weight = $$source[1];
    my @wordSequence = @{$$source[2]};
    my @lcs = LCS(\@wordSequence, \@gismuSequence);
-   if (@lcs >= 3) { $score += $weight * @lcs / @wordSequence }
-   elsif (@lcs == 2 && match2($word, \@gismuSequence)) {
-    $score += $weight * 2 / @wordSequence
-   }
+   $score += $weight * @lcs / @wordSequence
+    if @lcs >= 3 || (@lcs == 2 && match2($word, \@gismuSequence));
   }
-  if ($score >= $minMax) {
+  if (!@bestGismu) { push @bestGismu, [$score, $gismu] }
+  elsif ($score >= $bestGismu[$#bestGismu][0]) {
    for my $i (0..$#bestGismu) {
     if ($score == $bestGismu[$i][0]) {
      push @{$bestGismu[$i]}, $gismu;
      last;
     } elsif ($score > $bestGismu[$i][0]) {
      splice @bestGismu, $i, 0, [$score, $gismu];
-     if (@bestGismu > $maxQty) {
-      pop @bestGismu;
-      $minMax = $bestGismu[$maxQty-1][0];
-     }
+     pop @bestGismu if @bestGismu > $maxQty;
      last;
     }
    }

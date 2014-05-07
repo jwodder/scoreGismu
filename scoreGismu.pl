@@ -119,10 +119,8 @@ for my $check (@checks) {
    my @wordSequence = @{$$source[2]};
    my @lcs = LCS(\@wordSequence, \@gismuSequence);
    if (@lcs >= 3) { $score += $weight * @lcs / @wordSequence }
-   elsif (@lcs == 2) {
+   elsif (@lcs == 2 && match2($word, \@gismuSequence)) {
     $score += $weight * 2 / @wordSequence
-     if $gismu =~ /$lcs[0]$lcs[1]/ && $word =~ /$lcs[0]$lcs[1]/
-     || $gismu =~ /$lcs[0].$lcs[1]/ && $word =~ /$lcs[0].$lcs[1]/
    }
   }
   if ($score >= $minMax) {
@@ -143,4 +141,20 @@ for my $check (@checks) {
  }
  print "Top score is $bestGismu[0][0].\n";
  printf " %-6g - %s\n", $_->[0], join(' ', splice(@$_, 1)) for @bestGismu;
+}
+
+sub match2 {
+ # It's possible for there to be multiple two-character LCS's for a given pair
+ # of strings, one of which meets the criteria in step 2b of the {gismu}
+ # creation algorithm and one of which doesn't, and so the output from an LCS
+ # function (unless it returns *all* LCS's) can't be used for step 2b.
+ # Instead, almost all possible two-character substrings must be checked by
+ # brute-force.  If you've got a better idea, I'd like to hear it.
+ my($word, $gismuseq) = @_;
+ my @gs = @$gismuseq;
+ for my $i (0..3) {
+  if ($i < 3) { return 1 if $word =~ /$gs[$i]($gs[$i+1]|.$gs[$i+2])/ }
+  else { return 1 if index($word, $gs[$i] . $gs[$i+1]) != -1 }
+ }
+ return 0;
 }

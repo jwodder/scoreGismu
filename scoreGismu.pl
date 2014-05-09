@@ -5,7 +5,7 @@ use Getopt::Std;
 
 my $maxQty = 5;
 my %opts;
-getopts('g:m:', \%opts) || exit 2;
+getopts('G:g:m:', \%opts) || exit 2;
 $maxQty = int($opts{m}) || $maxQty if $opts{m};
 
 my @checks;
@@ -14,10 +14,10 @@ while (<>) {
  if (/^\s*(?:\S+\s+\d*\.?\d+\s*)+$/) {
   my @temp = split;
   for (my $i=0; $i<@temp; $i+=2) {
-   $sourceWords{$temp[$i]} += $temp[$i+1];
+   $sourceWords{$temp[$i]} += $temp[$i+1]
   }
  } elsif (/\S/) {
-  ++$sourceWords{$_} for split;
+  ++$sourceWords{$_} for split
  }
  push @checks, [ map { [$_, $sourceWords{$_}, [split //]] } keys %sourceWords ]
   if %sourceWords;
@@ -56,45 +56,52 @@ my %blockingLetters = ('m' => ['n'],
 		       'j' => ['c', 'z']);
 
 my %possibleGismu;
-for my $c1 (@consonants) {
- for my $v1 (@vowels) {
-  for my $c2 (@internalPairs) {
-   for my $v2 (@vowels) {
-    $possibleGismu{"$c1$v1$c2$v2"} = 1;
-   }
-  }
+if (exists $opts{G}) {
+ open my $in, '<', $opts{G} or die "$0: $opts{G}: $!";
+ while (<$in>) {
+  $possibleGismu{$1} = 1 if /^\s*([a-gi-pr-vxz]{5})\s*$/
  }
-}
-for my $c1 (@initialPairs) {
- for my $v1 (@vowels) {
-  for my $c2 (@consonants) {
-   for my $v2 (@vowels) {
-    $possibleGismu{"$c1$v1$c2$v2"} = 1;
-   }
-  }
- }
-}
-
-if (exists $opts{g}) {
- open(IN, '<', $opts{g}) or die "$0: $opts{g}: $!";
- while (<IN>) {
-  if (/^\s*([a-gi-pr-vxz]{5})\s*$/) {
-   my $gismu = $1;
-   my $g4 = substr($gismu, 0, 4);
-   delete $possibleGismu{"$g4$_"} for @vowels;
-   for my $i (0..3) {
-    my $letter = substr($gismu, $i, 1);
-    if (exists $blockingLetters{$letter}) {
-     for my $newLetter (@{$blockingLetters{$letter}}) {
-      substr($gismu, $i, 1) = $newLetter;
-      delete $possibleGismu{$gismu};
-     }
-     substr($gismu, $i, 1) = $letter;
+ close $in;
+} else {
+ for my $c1 (@consonants) {
+  for my $v1 (@vowels) {
+   for my $c2 (@internalPairs) {
+    for my $v2 (@vowels) {
+     $possibleGismu{"$c1$v1$c2$v2"} = 1;
     }
    }
   }
  }
- close IN;
+ for my $c1 (@initialPairs) {
+  for my $v1 (@vowels) {
+   for my $c2 (@consonants) {
+    for my $v2 (@vowels) {
+     $possibleGismu{"$c1$v1$c2$v2"} = 1;
+    }
+   }
+  }
+ }
+ if (exists $opts{g}) {
+  open $in, '<', $opts{g} or die "$0: $opts{g}: $!";
+  while (<$in>) {
+   if (/^\s*([a-gi-pr-vxz]{5})\s*$/) {
+    my $gismu = $1;
+    my $g4 = substr($gismu, 0, 4);
+    delete $possibleGismu{"$g4$_"} for @vowels;
+    for my $i (0..3) {
+     my $letter = substr($gismu, $i, 1);
+     if (exists $blockingLetters{$letter}) {
+      for my $newLetter (@{$blockingLetters{$letter}}) {
+       substr($gismu, $i, 1) = $newLetter;
+       delete $possibleGismu{$gismu};
+      }
+      substr($gismu, $i, 1) = $letter;
+     }
+    }
+   }
+  }
+  close $in;
+ }
 }
 
 print "Preliminary work finished.  Beginning scoring.\n";

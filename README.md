@@ -1,4 +1,4 @@
-    perl scoreGismu.pl [-g gismu file] [-m num] [input file]
+    perl scoreGismu.pl [-g file | -G file] [-m num] [input file]
 
 `scoreGismu.pl` implements steps 2 through 5 of the _gismu_ scoring algorithm
 described in §4.14 of _The Complete Lojban Language_ to produce a _gismu_ from
@@ -23,6 +23,11 @@ A file containing a list of pre-existing _gismu_, one per line, may optionally
 be specified with the `-g` switch.  Any _gismu_ listed in this file or that
 conflicts with a _gismu_ in this file will be excluded from consideration for
 the algorithm.
+
+A file containing a list of potential _gismu_, one per line, may optionally be
+specified with the `-G` switch.  Only the _gismu_ listed in this file will be
+considered by the algorithm.  If both a `-g` switch and a `-G` switch are
+given, the `-g` switch is ignored.
 
 This code was originally taken from [\[1\]][1], where it [was credited to one
 "Hussell"][2].

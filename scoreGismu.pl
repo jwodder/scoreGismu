@@ -82,7 +82,7 @@ if (exists $opts{G}) {
   }
  }
  if (exists $opts{g}) {
-  open $in, '<', $opts{g} or die "$0: $opts{g}: $!";
+  open my $in, '<', $opts{g} or die "$0: $opts{g}: $!";
   while (<$in>) {
    if (/^\s*([a-gi-pr-vxz]{5})\s*$/) {
     my $gismu = $1;

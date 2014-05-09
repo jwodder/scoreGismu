@@ -54,10 +54,11 @@ bool cmpRank(const gismuRank& a, double b);
 
 int main(int argc, char** argv) {
  int maxQty = 5, ch;
- char* gimste = NULL;
- while ((ch = getopt(argc, argv, "g:m:")) != -1) {
+ char *badlist = NULL, *goodlist = NULL;
+ while ((ch = getopt(argc, argv, "G:g:m:")) != -1) {
   switch (ch) {
-   case 'g': gimste = optarg; break;
+   case 'G': goodlist = optarg; break;
+   case 'g': badlist  = optarg; break;
    case 'm': {
     int tmp = strtol(optarg, NULL, 10);
     if (tmp >= 1) maxQty = tmp;
@@ -80,38 +81,8 @@ int main(int argc, char** argv) {
  } else {checks = readInput(cin); }
 
  set<string> possibleGismu;
- char gismuTmp[6] = {0};
- for (const char* c1 = consonants; *c1 != '\0'; c1++) {
-  gismuTmp[0] = *c1;
-  for (const char* v1 = vowels; *v1 != '\0'; v1++) {
-   gismuTmp[1] = *v1;
-   for (size_t i=0; i < sizeof(internalPairs)/sizeof(internalPairs[0]); i++) {
-    gismuTmp[2] = internalPairs[i][0];
-    gismuTmp[3] = internalPairs[i][1];
-    for (const char* v2 = vowels; *v2 != '\0'; v2++) {
-     gismuTmp[4] = *v2;
-     possibleGismu.insert(string(gismuTmp));
-    }
-   }
-  }
- }
- for (size_t i=0; i < sizeof(initialPairs)/sizeof(initialPairs[0]); i++) {
-  gismuTmp[0] = initialPairs[i][0];
-  gismuTmp[1] = initialPairs[i][1];
-  for (const char* v1 = vowels; *v1 != '\0'; v1++) {
-   gismuTmp[2] = *v1;
-   for (const char* c1 = consonants; *c1 != '\0'; c1++) {
-    gismuTmp[3] = *c1;
-    for (const char* v2 = vowels; *v2 != '\0'; v2++) {
-     gismuTmp[4] = *v2;
-     possibleGismu.insert(string(gismuTmp));
-    }
-   }
-  }
- }
-
- if (gimste != NULL) {
-  ifstream* gfile = openIF(argv[0], gimste);
+ if (goodlist != NULL) {
+  ifstream* gfile = openIF(argv[0], goodlist);
   if (!gfile) return 5;
   string line;
   while (getline(*gfile, line)) {
@@ -122,23 +93,70 @@ int main(int argc, char** argv) {
    string gismu = line.substr(gstart, gend - gstart + 1);
    if (gismu.find_first_not_of("abcdefgijklmnoprstuvxz") != string::npos)
     continue;
-   char letter = gismu[4];
-   for (const char* v1 = vowels; *v1 != '\0'; v1++) {
-    gismu[4] = *v1;
-    possibleGismu.erase(gismu);
-   }
-   gismu[4] = letter;
-   for (int i=0; i<4; i++) {
-    letter = gismu[i];
-    for (const char* c = blockingLetters[letter-'a']; *c != '\0'; c++) {
-     gismu[i] = *c;
-     possibleGismu.erase(gismu);
-    }
-    gismu[i] = letter;
-   }
+   possibleGismu.insert(gismu);
   }
   gfile->close();
   delete gfile;
+ } else {
+  char gismuTmp[6] = {0};
+  for (const char* c1 = consonants; *c1 != '\0'; c1++) {
+   gismuTmp[0] = *c1;
+   for (const char* v1 = vowels; *v1 != '\0'; v1++) {
+    gismuTmp[1] = *v1;
+    for (size_t i=0; i < sizeof(internalPairs)/sizeof(internalPairs[0]); i++) {
+     gismuTmp[2] = internalPairs[i][0];
+     gismuTmp[3] = internalPairs[i][1];
+     for (const char* v2 = vowels; *v2 != '\0'; v2++) {
+      gismuTmp[4] = *v2;
+      possibleGismu.insert(string(gismuTmp));
+     }
+    }
+   }
+  }
+  for (size_t i=0; i < sizeof(initialPairs)/sizeof(initialPairs[0]); i++) {
+   gismuTmp[0] = initialPairs[i][0];
+   gismuTmp[1] = initialPairs[i][1];
+   for (const char* v1 = vowels; *v1 != '\0'; v1++) {
+    gismuTmp[2] = *v1;
+    for (const char* c1 = consonants; *c1 != '\0'; c1++) {
+     gismuTmp[3] = *c1;
+     for (const char* v2 = vowels; *v2 != '\0'; v2++) {
+      gismuTmp[4] = *v2;
+      possibleGismu.insert(string(gismuTmp));
+     }
+    }
+   }
+  }
+  if (badlist != NULL) {
+   ifstream* gfile = openIF(argv[0], badlist);
+   if (!gfile) return 5;
+   string line;
+   while (getline(*gfile, line)) {
+    size_t gstart = line.find_first_not_of(" \t\n\r\v\f");
+    if (gstart == string::npos) continue;
+    size_t gend = line.find_last_not_of(" \t\n\r\v\f");
+    if (gend - gstart + 1 != 5) continue;
+    string gismu = line.substr(gstart, gend - gstart + 1);
+    if (gismu.find_first_not_of("abcdefgijklmnoprstuvxz") != string::npos)
+     continue;
+    char letter = gismu[4];
+    for (const char* v1 = vowels; *v1 != '\0'; v1++) {
+     gismu[4] = *v1;
+     possibleGismu.erase(gismu);
+    }
+    gismu[4] = letter;
+    for (int i=0; i<4; i++) {
+     letter = gismu[i];
+     for (const char* c = blockingLetters[letter-'a']; *c != '\0'; c++) {
+      gismu[i] = *c;
+      possibleGismu.erase(gismu);
+     }
+     gismu[i] = letter;
+    }
+   }
+   gfile->close();
+   delete gfile;
+  }
  }
 
  cout << "Preliminary work finished.  Beginning scoring." << endl;

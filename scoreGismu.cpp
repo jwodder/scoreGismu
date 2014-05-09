@@ -1,4 +1,6 @@
 #include <cstdlib>  /* strtol */
+#include <cstring>  /* strerror */
+#include <cerrno>
 #include <unistd.h>
 #include <iostream>
 #include <algorithm>  /* lower_bound, max, sort */
@@ -43,6 +45,7 @@ const char blockingLetters[26][3] = {
 
 typedef pair< double, deque<string> > gismuRank;  /* This shows up too much. */
 
+ifstream* openIF(const char* program, const char* path);
 deque< map<string,double> >* readInput(istream& in);
 int LCS(const string& a, const string& b);
 bool cmpInput(pair<string,double> a, pair<string,double> b);
@@ -69,16 +72,11 @@ int main(int argc, char** argv) {
 
  deque< map<string,double> >* checks;
  if (optind < argc) {
-  ifstream infile;
-  infile.exceptions(ifstream::failbit | ifstream::badbit);
-  try {
-   infile.open(argv[optind]);
-  } catch (ifstream::failure& e) {
-   cerr << argv[0] << ": " << argv[optind] << ": " << e.what() << endl;
-   return 5;
-  }
-  checks = readInput(infile);
-  infile.close();
+  ifstream* infile = openIF(argv[0], argv[optind]);
+  if (!infile) return 5;
+  checks = readInput(*infile);
+  infile->close();
+  delete infile;
  } else {checks = readInput(cin); }
 
  set<string> possibleGismu;
@@ -113,16 +111,10 @@ int main(int argc, char** argv) {
  }
 
  if (gimste != NULL) {
-  ifstream gfile;
-  gfile.exceptions(ifstream::failbit | ifstream::badbit);
-  try {
-   gfile.open(gimste);
-  } catch (ifstream::failure& e) {
-   cerr << argv[0] << ": " << gimste << ": " << e.what() << endl;
-   return 5;
-  }
+  ifstream* gfile = openIF(argv[0], gimste);
+  if (!gfile) return 5;
   string line;
-  while (getline(gfile, line)) {
+  while (getline(*gfile, line)) {
    size_t gstart = line.find_first_not_of(" \t\n\r\v\f");
    if (gstart == string::npos) continue;
    size_t gend = line.find_last_not_of(" \t\n\r\v\f");
@@ -145,7 +137,8 @@ int main(int argc, char** argv) {
     gismu[i] = letter;
    }
   }
-  gfile.close();
+  gfile->close();
+  delete gfile;
  }
 
  cout << "Preliminary work finished.  Beginning scoring." << endl;
@@ -205,6 +198,18 @@ int main(int argc, char** argv) {
  }
  delete checks;
  return 0;
+}
+
+ifstream* openIF(const char* program, const char* path) {
+ /* My version of GCC predates the ability to return streams from functions, so
+  * I have to return a pointer instead. */
+ ifstream* fp = new ifstream(path);
+ if (fp->is_open()) {return fp; }
+ else {
+  cerr << program << ": " << path << ": " << strerror(errno) << endl;
+  delete fp;
+  return NULL;
+ }
 }
 
 deque< map<string,double> >* readInput(istream& in) {

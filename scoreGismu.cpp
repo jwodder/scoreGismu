@@ -1,5 +1,5 @@
 #include <cstdlib>  /* strtol */
-#include <cstring>  /* strerror */
+#include <cstring>  /* strerror, strcmp */
 #include <cerrno>
 #include <unistd.h>
 #include <iostream>
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
  }
 
  deque< map<string,double> >* checks;
- if (optind < argc) {
+ if (optind < argc && strcmp(argv[optind], "-") != 0) {
   ifstream* infile = openIF(argv[0], argv[optind]);
   if (!infile) return 5;
   checks = readInput(*infile);
@@ -274,7 +274,6 @@ int LCS(const string& a, const string& b) {
 bool cmpInput(pair<string,double> a, pair<string,double> b) {
  return b.second < a.second || (b.second == a.second && a.first < b.first);
 }
-
 
 bool match2(const string& word, const string& gismu) {
  /* It's possible for there to be multiple two-character LCS's for a given pair

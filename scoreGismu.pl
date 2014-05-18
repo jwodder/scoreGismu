@@ -57,11 +57,12 @@ my %blockingLetters = ('m' => ['n'],
 
 my %possibleGismu;
 if (exists $opts{G}) {
- open my $in, '<', $opts{G} or die "$0: $opts{G}: $!";
+ my $in;
+ if ($opts{G} eq '-') { $in = *STDIN }
+ else { open $in, '<', $opts{G} or die "$0: $opts{G}: $!" }
  while (<$in>) {
   $possibleGismu{$1} = 1 if /^\s*([a-gi-pr-vxz]{5})\s*$/
  }
- close $in;
 } else {
  for my $c1 (@consonants) {
   for my $v1 (@vowels) {
@@ -82,7 +83,9 @@ if (exists $opts{G}) {
   }
  }
  if (exists $opts{g}) {
-  open my $in, '<', $opts{g} or die "$0: $opts{g}: $!";
+  my $in;
+  if ($opts{g} eq '-') { $in = *STDIN }
+  else { open $in, '<', $opts{g} or die "$0: $opts{g}: $!" }
   while (<$in>) {
    if (/^\s*([a-gi-pr-vxz]{5})\s*$/) {
     my $gismu = $1;
@@ -100,7 +103,6 @@ if (exists $opts{G}) {
     }
    }
   }
-  close $in;
  }
 }
 

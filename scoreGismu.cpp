@@ -72,12 +72,10 @@ int main(int argc, char** argv) {
  }
 
  deque< map<string,double> >* checks;
- if (optind < argc) {
-  istream* infile = openIF(argv[0], argv[optind]);
-  if (!infile) return 5;
-  checks = readInput(*infile);
-  if (infile != &cin) delete infile;
- } else {checks = readInput(cin); }
+ istream* infile = openIF(argv[0], optind < argc ? argv[optind] : "-");
+ if (!infile) return 5;
+ checks = readInput(*infile);
+ if (infile != &cin) delete infile;
 
  set<string> possibleGismu;
  if (goodlist != NULL) {

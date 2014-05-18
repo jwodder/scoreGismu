@@ -45,7 +45,7 @@ const char blockingLetters[26][3] = {
 
 typedef pair< double, deque<string> > gismuRank;  /* This shows up too much. */
 
-ifstream* openIF(const char* program, const char* path);
+istream* openIF(const char* program, const char* path);
 deque< map<string,double> >* readInput(istream& in);
 int LCS(const string& a, const string& b);
 bool cmpInput(pair<string,double> a, pair<string,double> b);
@@ -72,17 +72,16 @@ int main(int argc, char** argv) {
  }
 
  deque< map<string,double> >* checks;
- if (optind < argc && strcmp(argv[optind], "-") != 0) {
-  ifstream* infile = openIF(argv[0], argv[optind]);
+ if (optind < argc) {
+  istream* infile = openIF(argv[0], argv[optind]);
   if (!infile) return 5;
   checks = readInput(*infile);
-  infile->close();
-  delete infile;
+  if (infile != &cin) delete infile;
  } else {checks = readInput(cin); }
 
  set<string> possibleGismu;
  if (goodlist != NULL) {
-  ifstream* gfile = openIF(argv[0], goodlist);
+  istream* gfile = openIF(argv[0], goodlist);
   if (!gfile) return 5;
   string line;
   while (getline(*gfile, line)) {
@@ -95,8 +94,7 @@ int main(int argc, char** argv) {
     continue;
    possibleGismu.insert(gismu);
   }
-  gfile->close();
-  delete gfile;
+  if (gfile != &cin) delete gfile;
  } else {
   char gismuTmp[6] = {0};
   for (const char* c1 = consonants; *c1 != '\0'; c1++) {
@@ -128,7 +126,7 @@ int main(int argc, char** argv) {
    }
   }
   if (badlist != NULL) {
-   ifstream* gfile = openIF(argv[0], badlist);
+   istream* gfile = openIF(argv[0], badlist);
    if (!gfile) return 5;
    string line;
    while (getline(*gfile, line)) {
@@ -154,8 +152,7 @@ int main(int argc, char** argv) {
      gismu[i] = letter;
     }
    }
-   gfile->close();
-   delete gfile;
+   if (gfile != &cin) delete gfile;
   }
  }
 
@@ -218,9 +215,10 @@ int main(int argc, char** argv) {
  return 0;
 }
 
-ifstream* openIF(const char* program, const char* path) {
+istream* openIF(const char* program, const char* path) {
  /* My version of GCC predates the ability to return streams from functions, so
   * I have to return a pointer instead. */
+ if (strcmp(path, "-") == 0) return &cin;
  ifstream* fp = new ifstream(path);
  if (fp->is_open()) {return fp; }
  else {

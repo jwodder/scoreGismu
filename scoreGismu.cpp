@@ -150,6 +150,12 @@ int main(int argc, char** argv) {
   }
  }
 
+ if (possibleGismu.empty()) {
+  cout << "No gismu to score." << endl;
+  delete checks;
+  return 0;
+ }
+
  cout << "Preliminary work finished.  Beginning scoring." << endl;
 
  deque< map<string,double> >::const_iterator iter;

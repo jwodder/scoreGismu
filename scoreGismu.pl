@@ -106,6 +106,11 @@ if (exists $opts{G}) {
  }
 }
 
+if (!%possibleGismu) {
+ print "No gismu to score.\n";
+ exit;
+}
+
 print "Preliminary work finished.  Beginning scoring.\n";
 
 for my $check (@checks) {

@@ -11,6 +11,7 @@
 #include <sstream>  /* istringstream */
 #include <string>
 #include <utility>  /* pair */
+#include <vector>
 using namespace std;
 
 const char vowels[] = "aeiou";
@@ -251,21 +252,14 @@ deque< map<string,double> >* readInput(istream& in) {
 }
 
 int LCS(const string& a, const string& b) {
- int** lengths = new int*[a.length()+1];
- for (size_t i=0; i<a.length()+1; i++) {
-  lengths[i] = new int[b.length()+1];
-  for (size_t j=0; j<b.length()+1; j++) lengths[i][j] = 0;
- }
+ vector< vector<int> > lengths(a.length()+1, vector<int>(b.length()+1, 0));
  for (size_t i=0; i<a.length(); i++) {
   for (size_t j=0; j<b.length(); j++) {
    if (a[i] == b[j]) lengths[i+1][j+1] = lengths[i][j] + 1;
    else lengths[i+1][j+1] = max(lengths[i+1][j], lengths[i][j+1]);
   }
  }
- int result = lengths[a.length()][b.length()];
- for (size_t i=0; i<a.length()+1; i++) delete[] lengths[i];
- delete[] lengths;
- return result;
+ return lengths[a.length()][b.length()];
 }
 
 bool cmpInput(pair<string,double> a, pair<string,double> b) {

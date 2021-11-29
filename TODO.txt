@@ -1,0 +1,14 @@
+- Add another branch that uses the Algorithm::Diff algorithm in C++ and see how
+  it performs
+- Handle input more rigorously:
+ - Lower-case all input
+ - Make sure all source word inputs are valid Lojban
+ - Support comments in input?
+- Explicitly point out in README.md that weights don't have to sum to one?
+- Get rid of the progress messages in the C++ port?
+- Try to find an even faster LCS algorithm
+- Try to find a faster way to handle 2-character LCS matches
+- C++: When building `possibleGismu` from scratch, should the {gismu} be
+  created in alphabetical order so that a `hint` value can be passed to
+  `set::insert` for efficiency?
+- Add a copy of the CLL's algorithm description to the repo?
